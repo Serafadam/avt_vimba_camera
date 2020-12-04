@@ -30,63 +30,50 @@
 /// (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 /// THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef MONO_CAMERA_H
-#define MONO_CAMERA_H
+#ifndef __MONO_CAMERA_H__
+#define __MONO_CAMERA_H__
 
 #include <avt_vimba_camera/avt_vimba_camera.h>
-#include <avt_vimba_camera/AvtVimbaCameraConfig.h>
-#include <avt_vimba_camera/avt_vimba_api.h>
 
-#include <ros/ros.h>
-#include <sensor_msgs/Image.h>
-#include <sensor_msgs/CameraInfo.h>
-#include <camera_info_manager/camera_info_manager.h>
-#include <image_transport/image_transport.h>
-#include <dynamic_reconfigure/server.h>
+namespace avt_vimba_camera 
+{
+class MonoCamera : public rclcpp::Node {
+public:
+    explicit MonoCamera(const rclcpp::NodeOptions&);
+    ~MonoCamera();
 
-#include <string>
+    rclcpp::Node::SharedPtr node_handle_;
 
-namespace avt_vimba_camera {
-class MonoCamera {
- public:
-  MonoCamera(ros::NodeHandle& nh, ros::NodeHandle& nhp);
-  ~MonoCamera(void);
+private:
+    AvtVimbaApi api_;
+    AvtVimbaCamera cam_;
 
- private:
-  AvtVimbaApi api_;
-  AvtVimbaCamera cam_;
+    std::string ip_;
+    std::string guid_;
+    std::string camera_info_url_;
+    bool show_debug_prints_;
 
-  // diagnostic_updater::Updater updater_;
-  // diagnostic_updater::TopicDiagnostic* pub_freq_;
+    // Camera configuration
+    typedef avt_vimba_camera::AvtVimbaCameraConfig Config;
+    Config camera_config_;
 
-  ros::NodeHandle nh_;
-  ros::NodeHandle nhp_;
+    // Camera parameters
+    // typedef avt_vimba_camera::AvtVimbaCameraParms CfgParms;
+    std::shared_ptr<avt_vimba_camera::AvtVimbaCameraParms> camera_parms_;
 
-  std::string ip_;
-  std::string guid_;
-  std::string camera_info_url_;
-  bool show_debug_prints_;
+    rclcpp::TimerBase::SharedPtr timer_;
+    std::chrono::steady_clock::time_point last_frame_;
+    std::shared_ptr<camera_info_manager::CameraInfoManager> info_man_;
+    image_transport::CameraPublisher camera_info_pub_;
+    // std::shared_ptr<sensor_msgs::msg::Image> image_msg_;
+    rclcpp::Clock ros_clock_;
 
-  image_transport::ImageTransport it_;
-  // ROS Camera publisher
-  image_transport::CameraPublisher pub_;
-
+    void ImageCallback();
 
 
-  // sensor_msgs::CameraInfo left_info_;
-  boost::shared_ptr<camera_info_manager::CameraInfoManager> info_man_;
-
-  // Dynamic reconfigure
-  typedef avt_vimba_camera::AvtVimbaCameraConfig Config;
-  typedef dynamic_reconfigure::Server<Config> ReconfigureServer;
-  ReconfigureServer reconfigure_server_;
-
-  // Camera configuration
-  Config camera_config_;
-
-  void frameCallback(const FramePtr& vimba_frame_ptr);
-  void configure(Config& newconfig, uint32_t level);
-  void updateCameraInfo(const Config& config);
+    void frameCallback(const FramePtr& vimba_frame_ptr);
+    void configure(Config& newconfig, uint32_t level);
+    void updateCameraInfo(const Config& config);
 };
 }
-#endif
+#endif  // __MONO_CAMERA_H__

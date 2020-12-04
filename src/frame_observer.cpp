@@ -1,4 +1,4 @@
-﻿/// Copyright (c) 2014,
+/// Copyright (c) 2014,
 /// Systems, Robotics and Vision Group
 /// University of the Balearic Islands
 /// All rights reserved.
@@ -42,7 +42,6 @@ void FrameObserver::FrameReceived( const FramePtr vimba_frame_ptr )
 {
   VmbFrameStatusType eReceiveStatus;
   VmbErrorType err = vimba_frame_ptr->GetReceiveStatus(eReceiveStatus);
-
   if (err == VmbErrorSuccess) {
     switch (eReceiveStatus)
     {

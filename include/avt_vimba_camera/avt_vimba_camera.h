@@ -33,19 +33,24 @@
 #ifndef AVT_VIMBA_CAMERA_H
 #define AVT_VIMBA_CAMERA_H
 
-#include <VimbaCPP/Include/VimbaCPP.h>
+#include <stdio.h>
+#include <iostream>
+#include <string>
+#include <functional>
 
-#include <avt_vimba_camera/AvtVimbaCameraConfig.h>
+#include "rclcpp/rclcpp.hpp"
+#include "std_msgs/msg/string.hpp"
+#include "sensor_msgs/msg/image.hpp"
+#include "sensor_msgs/msg/camera_info.hpp"
+#include "sensor_msgs/image_encodings.hpp"
+#include <camera_info_manager/camera_info_manager.hpp>
+#include <image_transport/image_transport.hpp>
+
+#include <VimbaCPP/Include/VimbaCPP.h>                // Vimba camera SDK
+#include <avt_vimba_camera/AvtVimbaCameraConfig.h>    // config data structs
+#include <avt_vimba_camera/AvtVimbaCameraParms.h>     // config data parms
 #include <avt_vimba_camera/frame_observer.h>
 #include <avt_vimba_camera/avt_vimba_api.h>
-
-#include <diagnostic_updater/diagnostic_updater.h>
-#include <diagnostic_updater/publisher.h>
-
-#include <boost/function.hpp>
-#include <boost/thread.hpp>
-
-#include <string>
 
 using AVT::VmbAPI::VimbaSystem;
 using AVT::VmbAPI::CameraPtr;
@@ -93,8 +98,10 @@ class AvtVimbaCamera {
   int getMaxHeight();
 
   // Pass callback function pointer
-  typedef boost::function<void (const FramePtr)> frameCallbackFunc;
-  void setCallback(frameCallbackFunc callback = &avt_vimba_camera::AvtVimbaCamera::defaultFrameCallback) {
+  //np typedef boost::function<void (const FramePtr)> frameCallbackFunc;
+  typedef std::function<void (const FramePtr)> frameCallbackFunc;
+  //np void setCallback(frameCallbackFunc callback = &avt_vimba_camera::AvtVimbaCamera::defaultFrameCallback) {
+  void setCallback(frameCallbackFunc callback) {
     userFrameCallback = callback;
   }
 
@@ -104,7 +111,7 @@ class AvtVimbaCamera {
   void stopImaging(void);
   bool isOpened(void) { return opened_; }
 
- private:
+private:
   Config config_;
 
   AvtVimbaApi api_;
@@ -120,7 +127,7 @@ class AvtVimbaCamera {
   VmbInt64_t vimba_camera_max_height_;
 
   // Mutex
-  boost::mutex config_mutex_;
+//np  boost::mutex config_mutex_;
 
   bool opened_;
   bool streaming_;
@@ -128,9 +135,19 @@ class AvtVimbaCamera {
   bool show_debug_prints_;
   std::string name_;
 
-  diagnostic_updater::Updater updater_;
+//np  diagnostic_updater::Updater updater_;
   CameraState camera_state_;
   std::string diagnostic_msg_;
+
+  // ROS2
+  rclcpp::TimerBase::SharedPtr timer_;
+  std::chrono::steady_clock::time_point last_frame_;
+  std::shared_ptr<camera_info_manager::CameraInfoManager> cinfo_manager_;
+  image_transport::CameraPublisher camera_info_pub_;
+  //std::shared_ptr<sensor_msgs::msg::Image> image_msg_;
+  //std::shared_ptr<sensor_msgs::msg::Image> ConvertFrameToMessage(cv::Mat & frame);
+  std::shared_ptr<sensor_msgs::msg::Image> ConvertFrameToMessage(int & frame);
+  void ImageCallback();
 
   // ROS params
   int num_frames_;
@@ -138,6 +155,8 @@ class AvtVimbaCamera {
   std::string frame_id_;
   std::string trigger_source_;
   int trigger_source_int_;
+
+  // ROS2 support
 
   CameraPtr openCamera(std::string id_str);
 
@@ -170,7 +189,7 @@ class AvtVimbaCamera {
   void updateGPIOConfig(Config& config);
   void updateIrisConfig(Config& config);
 
-  void getCurrentState(diagnostic_updater::DiagnosticStatusWrapper &stat);
+  //np void getCurrentState(diagnostic_updater::DiagnosticStatusWrapper &stat);
 
 };
 }
