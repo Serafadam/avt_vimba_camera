@@ -58,8 +58,59 @@ private:
     Config camera_config_;
 
     // Camera parameters
-    // typedef avt_vimba_camera::AvtVimbaCameraParms CfgParms;
-    std::shared_ptr<avt_vimba_camera::AvtVimbaCameraParms> camera_parms_;
+    // std::shared_ptr<avt_vimba_camera::AvtVimbaCameraParms> camera_parms_;
+  	rcl_interfaces::msg::ParameterDescriptor frame_id_descriptor;
+  	rcl_interfaces::msg::ParameterDescriptor trig_timestamp_topic_descriptor;
+  	rcl_interfaces::msg::ParameterDescriptor acquisition_mode_descriptor;
+  	rcl_interfaces::msg::ParameterDescriptor acquisition_rate_descriptor;
+  	rcl_interfaces::msg::ParameterDescriptor trigger_source_descriptor;
+  	rcl_interfaces::msg::ParameterDescriptor trigger_mode_descriptor;
+  	rcl_interfaces::msg::ParameterDescriptor trigger_selector_descriptor;
+  	rcl_interfaces::msg::ParameterDescriptor trigger_activation_descriptor;
+  	rcl_interfaces::msg::ParameterDescriptor trigger_delay_descriptor;
+  	rcl_interfaces::msg::ParameterDescriptor exposure_descriptor;
+  	rcl_interfaces::msg::ParameterDescriptor exposure_auto_descriptor;
+  	rcl_interfaces::msg::ParameterDescriptor exposure_auto_alg_descriptor;
+  	rcl_interfaces::msg::ParameterDescriptor exposure_auto_tol_descriptor;
+  	rcl_interfaces::msg::ParameterDescriptor exposure_auto_max_descriptor;
+  	rcl_interfaces::msg::ParameterDescriptor exposure_auto_min_descriptor;
+  	rcl_interfaces::msg::ParameterDescriptor exposure_auto_outliers_descriptor;
+  	rcl_interfaces::msg::ParameterDescriptor exposure_auto_rate_descriptor;
+  	rcl_interfaces::msg::ParameterDescriptor exposure_auto_target_descriptor;
+  	rcl_interfaces::msg::ParameterDescriptor gain_descriptor;
+  	rcl_interfaces::msg::ParameterDescriptor gain_auto_descriptor;
+  	rcl_interfaces::msg::ParameterDescriptor gain_auto_tol_descriptor;
+  	rcl_interfaces::msg::ParameterDescriptor gain_auto_max_descriptor;
+  	rcl_interfaces::msg::ParameterDescriptor gain_auto_min_descriptor;
+  	rcl_interfaces::msg::ParameterDescriptor gain_auto_outliers_descriptor;
+  	rcl_interfaces::msg::ParameterDescriptor gain_auto_rate_descriptor;
+  	rcl_interfaces::msg::ParameterDescriptor gain_auto_target_descriptor;
+  	rcl_interfaces::msg::ParameterDescriptor balance_ratio_abs_descriptor;
+  	rcl_interfaces::msg::ParameterDescriptor balance_ratio_selector_descriptor;
+  	rcl_interfaces::msg::ParameterDescriptor whitebalance_auto_descriptor;
+  	rcl_interfaces::msg::ParameterDescriptor whitebalance_auto_tol_descriptor;
+  	rcl_interfaces::msg::ParameterDescriptor whitebalance_auto_rate_descriptor;
+  	rcl_interfaces::msg::ParameterDescriptor binning_x_descriptor;
+  	rcl_interfaces::msg::ParameterDescriptor binning_y_descriptor;
+  	rcl_interfaces::msg::ParameterDescriptor decimation_x_descriptor;
+  	rcl_interfaces::msg::ParameterDescriptor decimation_y_descriptor;
+  	rcl_interfaces::msg::ParameterDescriptor width_descriptor;
+  	rcl_interfaces::msg::ParameterDescriptor height_descriptor;
+  	rcl_interfaces::msg::ParameterDescriptor roi_width_descriptor;
+  	rcl_interfaces::msg::ParameterDescriptor roi_height_descriptor;
+  	rcl_interfaces::msg::ParameterDescriptor roi_offset_x_descriptor;
+  	rcl_interfaces::msg::ParameterDescriptor roi_offset_y_descriptor;
+  	rcl_interfaces::msg::ParameterDescriptor pixel_format_descriptor;
+  	rcl_interfaces::msg::ParameterDescriptor stream_bytes_per_second_descriptor;
+  	rcl_interfaces::msg::ParameterDescriptor ptp_mode_descriptor;
+  	rcl_interfaces::msg::ParameterDescriptor sync_in_selector_descriptor;
+  	rcl_interfaces::msg::ParameterDescriptor sync_out_polarity_descriptor;
+  	rcl_interfaces::msg::ParameterDescriptor sync_out_selector_descriptor;
+  	rcl_interfaces::msg::ParameterDescriptor sync_out_source_descriptor;
+  	rcl_interfaces::msg::ParameterDescriptor iris_auto_target_descriptor;
+  	rcl_interfaces::msg::ParameterDescriptor iris_mode_descriptor;
+  	rcl_interfaces::msg::ParameterDescriptor iris_video_level_min_descriptor;
+  	rcl_interfaces::msg::ParameterDescriptor iris_video_level_max_descriptor;
 
     rclcpp::TimerBase::SharedPtr timer_;
     std::chrono::steady_clock::time_point last_frame_;
@@ -68,9 +119,9 @@ private:
     // std::shared_ptr<sensor_msgs::msg::Image> image_msg_;
     rclcpp::Clock ros_clock_;
 
+    rcl_interfaces::msg::SetParametersResult parametersCallback (const std::vector<rclcpp::Parameter> &parameters);
+
     void ImageCallback();
-
-
     void frameCallback(const FramePtr& vimba_frame_ptr);
     void configure(Config& newconfig, uint32_t level);
     void updateCameraInfo(const Config& config);

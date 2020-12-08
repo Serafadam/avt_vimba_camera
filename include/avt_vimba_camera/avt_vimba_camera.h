@@ -48,7 +48,7 @@
 
 #include <VimbaCPP/Include/VimbaCPP.h>                // Vimba camera SDK
 #include <avt_vimba_camera/AvtVimbaCameraConfig.h>    // config data structs
-#include <avt_vimba_camera/AvtVimbaCameraParms.h>     // config data parms
+//#include <avt_vimba_camera/AvtVimbaCameraParms.h>     // config data parms
 #include <avt_vimba_camera/frame_observer.h>
 #include <avt_vimba_camera/avt_vimba_api.h>
 
@@ -162,9 +162,9 @@ private:
 
   frameCallbackFunc userFrameCallback;
   void frameCallback(const FramePtr vimba_frame_ptr);
-  void defaultFrameCallback(const FramePtr vimba_frame_ptr) {
-    std::cout << "[AvtVimbaCamera] No frame callback provided." << std::endl;
-  }
+  //void defaultFrameCallback(const FramePtr vimba_frame_ptr) {
+  //  std::cout << "[AvtVimbaCamera] No frame callback provided." << std::endl;
+  //}
 
   template<typename T>
   bool setFeatureValue(const std::string& feature_str, const T& val);

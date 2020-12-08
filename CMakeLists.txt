@@ -89,26 +89,19 @@ add_executable(mono_camera_node
   src/nodes/mono_camera_node.cpp
   src/mono_camera.cpp
   src/avt_vimba_camera.cpp
-  src/AvtVimbaCameraParms.cpp
   src/frame_observer.cpp
   ${SOURCES_AVT_CPP}
 )
 add_dependencies_and_linkings(mono_camera_node)
-# rclcpp_components_register_nodes(mono_camera_node "avt_vimba_camera::CameraDriver")
-# set(node_plugins "${node_plugins}avt_vimba_camera::CameraDriver;$<TARGET_FILE:avt_vimba_camera>\n")
 
-
-install(TARGETS
-  mono_camera_node
+install(TARGETS mono_camera_node
   ARCHIVE DESTINATION lib
   LIBRARY DESTINATION lib
-  RUNTIME DESTINATION bin
+  RUNTIME DESTINATION lib/${PROJECT_NAME}
 )
 
-
 # Install launch files.
-install(DIRECTORY
-  launch
+install(DIRECTORY launch
   DESTINATION share/${PROJECT_NAME}
 )
 

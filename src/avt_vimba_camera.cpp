@@ -42,10 +42,6 @@ using AVT::VmbAPI::FeaturePtrVector;
 
 namespace avt_vimba_camera {
 
-static const char* AutoMode[] = {
-  "Off",
-  "Once",
-  "Continuous"};
 static const char* TriggerMode[] = {
   "Freerun",
   "FixedRate",
@@ -54,6 +50,20 @@ static const char* TriggerMode[] = {
   "Line2",
   "Line3",
   "Line4" };
+
+static const char* FeatureDataType[] = {
+  "Unknown",
+  "int",
+  "float",
+  "enum",
+  "string",
+  "bool"};
+
+#if 0 //np: needed?
+static const char* AutoMode[] = {
+  "Off",
+  "Once",
+  "Continuous"};
 static const char* AcquisitionMode[] = {
   "Continuous",
   "SingleFrame",
@@ -90,13 +100,6 @@ static const char* PixelFormatMode[] = {
 static const char* BalanceRatioMode[] = {
   "Red",
   "Blue"};
-static const char* FeatureDataType[] = {
-  "Unknown",
-  "int",
-  "float",
-  "enum",
-  "string",
-  "bool"};
 
 static const char* State[] = {
   "Opening",
@@ -105,11 +108,12 @@ static const char* State[] = {
   "Format error",
   "Error",
   "Ok"};
-
+#endif // 0
 
 static volatile int keepRunning = 1;
 
 void intHandler(int dummy) {
+    dummy |= 0;
     keepRunning = 0;
 }
 
@@ -261,7 +265,7 @@ void AvtVimbaCamera::stopImaging(void) {
 void AvtVimbaCamera::updateConfig(Config& config) {
   //np boost::mutex::scoped_lock lock(config_mutex_);
 
-  frame_id_ =  config.frame_id;
+  frame_id_ =  config.frame_id_;
 
   if (streaming_) {
     stopImaging();
@@ -274,7 +278,7 @@ void AvtVimbaCamera::updateConfig(Config& config) {
   }
   diagnostic_msg_ = "Updating configuration";
   if(show_debug_prints_)
-    /* INFO */ std::cout << "Updating configuration for camera " << config.frame_id << std::endl;
+    /* INFO */ std::cout << "Updating configuration for camera " << config.frame_id_ << std::endl;
   updateExposureConfig(config);
   updateGainConfig(config);
   updateWhiteBalanceConfig(config);
@@ -376,7 +380,7 @@ CameraPtr AvtVimbaCamera::openCamera(std::string id_str) {
   //np ros::Duration(2.0).sleep();
   std::this_thread::sleep_for(std::chrono::seconds(2));
 
-  printAllCameraFeatures(camera);
+  //np printAllCameraFeatures(camera);
   opened_ = true;
   camera_state_ = IDLE;
   return camera;
@@ -860,7 +864,7 @@ void AvtVimbaCamera::updateAcquisitionConfig(Config& config) {
     setFeatureValue("TriggerDelayAbs", config.trigger_delay);
   }
   if(changed && show_debug_prints_){
-    /* INFO */ std::cout << "New Acquisition and Trigger config (" << config.frame_id << ") : "
+    /* INFO */ std::cout << "New Acquisition and Trigger config (" << config.frame_id_ << ") : "
       << "\n\tAcquisitionMode         : " << config.acquisition_mode   << " was " << config_.acquisition_mode
       << "\n\tAcquisitionFrameRateAbs : " << config.acquisition_rate   << " was " << config_.acquisition_rate
       << "\n\tTriggerMode             : " << config.trigger_mode       << " was " << config_.trigger_mode
@@ -897,7 +901,7 @@ void AvtVimbaCamera::updateIrisConfig(Config& config) {
                     static_cast<VmbInt64_t>(config.iris_video_level_min));
   }
   if(changed && show_debug_prints_){
-    /* INFO */ std::cout << "New Iris config (" << config.frame_id << ") : "
+    /* INFO */ std::cout << "New Iris config (" << config.frame_id_ << ") : "
       << "\n\tIrisAutoTarget    : " << config.iris_auto_target          << " was " << config_.iris_auto_target
 //      << "\n\tIrisMode          : " << config.iris_mode               << " was " << config_.iris_mode
 //      << "\n\tIrisVideoLevel    : " << config.iris_video_level        << " was " << config_.iris_video_level
@@ -954,7 +958,7 @@ void AvtVimbaCamera::updateExposureConfig(Config& config) {
                     static_cast<VmbInt64_t>(config.exposure_auto_target));
   }
   if(changed && show_debug_prints_){
-    /* INFO */ std::cout << "New Exposure config (" << config.frame_id << ") : "
+    /* INFO */ std::cout << "New Exposure config (" << config.frame_id_ << ") : "
       << "\n\tExposureTimeAbs       : " << config.exposure               << " was " << config_.exposure
       << "\n\tExposureAuto          : " << config.exposure_auto          << " was " << config_.exposure_auto
       << "\n\tExposureAutoAdjustTol : " << config.exposure_auto_tol      << " was " << config_.exposure_auto_tol
@@ -1006,7 +1010,7 @@ void AvtVimbaCamera::updateGainConfig(Config& config) {
     setFeatureValue("GainAutoRate", static_cast<VmbInt64_t>(config.gain_auto_target));
   }
   if(changed && show_debug_prints_){
-    /* INFO */ std::cout << "New Gain config (" << config.frame_id << ") : "
+    /* INFO */ std::cout << "New Gain config (" << config.frame_id_ << ") : "
       << "\n\tGain              : " << config.gain               << " was " << config_.gain
       << "\n\tGainAuto          : " << config.gain_auto          << " was " << config_.gain_auto
       << "\n\tGainAutoAdjustTol : " << config.gain_auto_tol      << " was " << config_.gain_auto_tol
@@ -1042,7 +1046,7 @@ void AvtVimbaCamera::updateWhiteBalanceConfig(Config& config){
     setFeatureValue("BalanceWhiteAutoRate", static_cast<VmbInt64_t>(config.whitebalance_auto_rate));
   }
   if(changed && show_debug_prints_){
-    /* INFO */ std::cout << "New White Balance config (" << config.frame_id << ") : "
+    /* INFO */ std::cout << "New White Balance config (" << config.frame_id_ << ") : "
       << "\n\tBalanceRatioAbs           : " << config.balance_ratio_abs      << " was " << config_.balance_ratio_abs
       << "\n\tBalanceRatioSelector      : " << config.balance_ratio_selector << " was " << config_.balance_ratio_selector
       << "\n\tBalanceWhiteAuto          : " << config.whitebalance_auto      << " was " << config_.whitebalance_auto
@@ -1060,7 +1064,7 @@ void AvtVimbaCamera::updatePtpModeConfig(Config& config) {
   }
 
   if(changed && show_debug_prints_){
-    /* INFO */ std::cout << "New PTP config (" << config.frame_id << ") : "
+    /* INFO */ std::cout << "New PTP config (" << config.frame_id_ << ") : "
       << "\n\tPtpMode                   : " << config.ptp_mode << " was " << config_.ptp_mode << std::endl;
   }
 }
@@ -1086,7 +1090,7 @@ void AvtVimbaCamera::updateImageModeConfig(Config& config) {
     setFeatureValue("BinningVertical", static_cast<VmbInt64_t>(config.binning_y));
   }
   if(changed && show_debug_prints_){
-    /* INFO */ std::cout << "New Image Mode config (" << config.frame_id << ") : "
+    /* INFO */ std::cout << "New Image Mode config (" << config.frame_id_ << ") : "
       << "\n\tDecimationHorizontal : " << config.decimation_x << " was " << config_.decimation_x
       << "\n\tDecimationVertical   : " << config.decimation_y << " was " << config_.decimation_y
       << "\n\tBinningHorizontal    : " << config.binning_x    << " was " << config_.binning_x
@@ -1156,7 +1160,7 @@ void AvtVimbaCamera::updateROIConfig(Config& config) {
   }
 
   if(changed && show_debug_prints_){
-    /* INFO */ std::cout << "New ROI config (" << config.frame_id << ") : "
+    /* INFO */ std::cout << "New ROI config (" << config.frame_id_ << ") : "
       << "\n\tOffsetX : " << config.roi_offset_x << " was " << config_.roi_offset_x
       << "\n\tOffsetY : " << config.roi_offset_y << " was " << config_.roi_offset_y
       << "\n\tWidth   : " << config.width        << " was " << config_.width
@@ -1174,7 +1178,7 @@ void AvtVimbaCamera::updateBandwidthConfig(Config& config) {
                     static_cast<VmbInt64_t>(config.stream_bytes_per_second));
   }
   if(changed && show_debug_prints_){
-    /* INFO */ std::cout << "New Bandwidth config (" << config.frame_id << ") : "
+    /* INFO */ std::cout << "New Bandwidth config (" << config.frame_id_ << ") : "
       << "\n\tStreamBytesPerSecond : " << config.stream_bytes_per_second << " was " << config_.stream_bytes_per_second << std::endl;
   }
 }
@@ -1187,7 +1191,7 @@ void AvtVimbaCamera::updatePixelFormatConfig(Config& config) {
     setFeatureValue("PixelFormat", config.pixel_format.c_str());
   }
   if(changed && show_debug_prints_){
-    /* INFO */ std::cout << "New PixelFormat config (" << config.frame_id << ") : "
+    /* INFO */ std::cout << "New PixelFormat config (" << config.frame_id_ << ") : "
       << "\n\tPixelFormat : " << config.pixel_format << " was " << config_.pixel_format << std::endl;
   }
 }
@@ -1216,7 +1220,7 @@ void AvtVimbaCamera::updateGPIOConfig(Config& config) {
     setFeatureValue("SyncOutSource", config.sync_out_source.c_str());
   }
   if(changed && show_debug_prints_){
-    /* INFO */ std::cout << "New GPIO config (" << config.frame_id << ") : "
+    /* INFO */ std::cout << "New GPIO config (" << config.frame_id_ << ") : "
       << "\n\tSyncInSelector  : " << config.sync_in_selector  << " was " << config_.sync_in_selector
       << "\n\tSyncOutPolarity : " << config.sync_out_polarity << " was " << config_.sync_out_polarity
       << "\n\tSyncOutSelector : " << config.sync_out_selector << " was " << config_.sync_out_selector

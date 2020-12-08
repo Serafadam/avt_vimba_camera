@@ -354,7 +354,7 @@ class DEFAULT
 }groups;
 #endif // np
 
-    std::string frame_id;
+    std::string frame_id_;
     std::string trig_timestamp_topic;
     std::string acquisition_mode;
     double acquisition_rate;
