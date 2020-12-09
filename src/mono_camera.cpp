@@ -160,89 +160,33 @@ MonoCamera::MonoCamera(const rclcpp::NodeOptions &node_options) :
     rmw_qos_profile_t custom_qos_profile = rmw_qos_profile_sensor_data;
     custom_qos_profile.depth = 6;  // TEST
     camera_info_pub_ = image_transport::create_camera_publisher(this, "image", custom_qos_profile);
-
     info_man_ = std::make_shared<camera_info_manager::CameraInfoManager>(this);
-
-#if 0 // [neil-rti] this was a test; calibration is loaded in configure() call tree
-    /* get ROS2 config parameter for camera calibration file */
-    auto camera_calibration_file_param_ = this->declare_parameter("camera_calibration_file", "file://config/camera.yaml");
-    cinfo_manager_->loadCameraInfo(camera_calibration_file_param_);
-#endif  //np
-
     last_frame_ = std::chrono::steady_clock::now();
 
   // Set the frame callback
   cam_.setCallback(std::bind(&avt_vimba_camera::MonoCamera::frameCallback, this, std::placeholders::_1));
 
-
-#if 0 //np
-  // Set the params
-  nhp_.param("ip", ip_, std::string(""));
-  nhp_.param("guid", guid_, std::string(""));
-  nhp_.param("camera_info_url", camera_info_url_, std::string(""));
-  std::string frame_id;
-  nhp_.param("frame_id", frame_id, std::string(""));
-  nhp_.param("show_debug_prints", show_debug_prints_, false);
-#endif  //np
-
-  // [neil-rti] test w/default config
-    camera_config_.frame_id_ = std::string("camera");
-    camera_config_.trig_timestamp_topic = std::string("");
-    camera_config_.acquisition_mode = std::string("Continuous");
-    camera_config_.acquisition_rate = (double)30;
-    camera_config_.trigger_source = std::string("FixedRate");
-    camera_config_.trigger_mode = std::string("On");
-    camera_config_.trigger_selector = std::string("FrameStart");
-    camera_config_.trigger_activation = std::string("RisingEdge");
-    camera_config_.trigger_delay = (double)0.0;
-    camera_config_.exposure = (double)50000;
-    camera_config_.exposure_auto = std::string("Continuous");
-    camera_config_.exposure_auto_alg = std::string("FitRange");
-    camera_config_.exposure_auto_tol = 5;
-    camera_config_.exposure_auto_max = 50000;
-    camera_config_.exposure_auto_min = 41;
-    camera_config_.exposure_auto_outliers = 0;
-    camera_config_.exposure_auto_rate = 100;
-    camera_config_.exposure_auto_target = 50;
-    camera_config_.gain = (double)0;
-    camera_config_.gain_auto = std::string("Continuous");
-    camera_config_.gain_auto_tol = 5;
-    camera_config_.gain_auto_max = (double)32;
-    camera_config_.gain_auto_min = (double)0;
-    camera_config_.gain_auto_outliers = 0;
-    camera_config_.gain_auto_rate = 100;
-    camera_config_.gain_auto_target = 50;
-    camera_config_.balance_ratio_abs = (double)1.0;
-    camera_config_.balance_ratio_selector = std::string("Red");
-    camera_config_.whitebalance_auto = std::string("Continuous");
-    camera_config_.whitebalance_auto_tol = 5;
-    camera_config_.whitebalance_auto_rate = 100;
-    camera_config_.binning_x = 1;
-    camera_config_.binning_y = 1;
-    camera_config_.decimation_x = 1;
-    camera_config_.decimation_y = 1;
-    camera_config_.width = 2064;
-    camera_config_.height = 1544;
-    camera_config_.roi_width = 0;
-    camera_config_.roi_height = 0;
-    camera_config_.roi_offset_x = 0;
-    camera_config_.roi_offset_y = 0;
-    camera_config_.pixel_format = std::string("Mono8");
-    camera_config_.stream_bytes_per_second = 45000000;
-    camera_config_.ptp_mode = std::string("Off");
-    camera_config_.sync_in_selector = std::string("SyncIn1");
-    camera_config_.sync_out_polarity = std::string("Normal");
-    camera_config_.sync_out_selector = std::string("SyncOut1");
-    camera_config_.sync_out_source = std::string("GPO");
-    camera_config_.iris_auto_target = 50;
-    camera_config_.iris_mode = std::string("Continuous");
-    camera_config_.iris_video_level_min = 110;
-    camera_config_.iris_video_level_max = 110;
-
+  /* [neil-rti] FIXME: I'm not yet certain of the right way to get preloaded-from-yaml
+   * parms into the camera configuration at startup.  The call below will fail if the
+   * yaml file isn't used or doesn't line up perfectly.
+   */
+  ip_ = std::string("192.168.1.16");  // [neil-rti] FIXME: need a config option
+    parametersCallback(this->get_parameters({
+      "height", "width", "acquisition_mode", "acquisition_rate", "balance_ratio_abs", 
+      "balance_ratio_selector", "binning_x", "binning_y", "decimation_x", "decimation_y", 
+      "exposure", "exposure_auto", "exposure_auto_alg", "exposure_auto_max", "exposure_auto_min", 
+      "exposure_auto_outliers", "exposure_auto_rate", "exposure_auto_target", "exposure_auto_tol", 
+      "frame_id", "gain", "gain_auto", "gain_auto_max", "gain_auto_min", "gain_auto_outliers", 
+      "gain_auto_rate", "gain_auto_target", "gain_auto_tol", "iris_auto_target", "iris_mode", 
+      "iris_video_level_max", "iris_video_level_min", "pixel_format", "ptp_mode", "roi_height", 
+      "roi_offset_x", "roi_offset_y", "roi_width", "stream_bytes_per_second", "sync_in_selector", 
+      "sync_out_polarity", "sync_out_selector", "sync_out_source", "trig_timestamp_topic", 
+      "trigger_activation", "trigger_delay", "trigger_mode", "trigger_selector", "trigger_source", 
+      "use_sim_time", "whitebalance_auto", "whitebalance_auto_rate", "whitebalance_auto_tol"
+    }));
 
   // Start dynamic_reconfigure & run configure()
   //np reconfigure_server_.setCallback(boost::bind(&avt_vimba_camera::MonoCamera::configure, this, _1, _2));
-  ip_ = std::string("192.168.1.16");  // [neil-rti] test
   configure(camera_config_, 0);
 
 }
@@ -584,10 +528,6 @@ rcl_interfaces::msg::SetParametersResult MonoCamera::parametersCallback (
 }
 
 void MonoCamera::frameCallback(const FramePtr& vimba_frame_ptr) {
-  static int nth = 20;
-  if(--nth <= 0) {
-    nth = 20;
-  std::cout << "In the callback " << camera_info_pub_.getNumSubscribers() << std::endl;
   //np ros::Time ros_time = ros::Time::now();
   rclcpp::Time ros_time = ros_clock_.now();
 
@@ -602,7 +542,6 @@ void MonoCamera::frameCallback(const FramePtr& vimba_frame_ptr) {
       //np ROS_WARN_STREAM("Function frameToImage returned 0. No image published.");
       std::cout << "Function frameToImage returned 0. No image published." << std::endl;
     }
-  }
   }
   // updater_.update();
 }

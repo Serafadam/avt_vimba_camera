@@ -1,5 +1,8 @@
 avt_vimba_camera:
   ros__parameters:
+    width: 640
+    height: 400
+    frame_id: map
     acquisition_mode: Continuous
     acquisition_rate: 30
     balance_ratio_abs: 1.0
@@ -17,7 +20,6 @@ avt_vimba_camera:
     exposure_auto_rate: 100
     exposure_auto_target: 50
     exposure_auto_tol: 5
-    frame_id: camera
     gain: 0
     gain_auto: Continuous
     gain_auto_max: 32
@@ -26,12 +28,11 @@ avt_vimba_camera:
     gain_auto_rate: 100
     gain_auto_target: 50
     gain_auto_tol: 5
-    height: 4096
     iris_auto_target: 50
     iris_mode: Continuous
     iris_video_level_max: 110
     iris_video_level_min: 110
-    pixel_format: Mono8
+    pixel_format: BGR8Packed
     ptp_mode: 'Off'
     roi_height: 0
     roi_offset_x: 0
@@ -52,4 +53,3 @@ avt_vimba_camera:
     whitebalance_auto: Continuous
     whitebalance_auto_rate: 100
     whitebalance_auto_tol: 5
-    width: 4096
