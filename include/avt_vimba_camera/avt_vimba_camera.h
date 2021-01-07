@@ -98,9 +98,7 @@ class AvtVimbaCamera {
   int getMaxHeight();
 
   // Pass callback function pointer
-  //np typedef boost::function<void (const FramePtr)> frameCallbackFunc;
   typedef std::function<void (const FramePtr)> frameCallbackFunc;
-  //np void setCallback(frameCallbackFunc callback = &avt_vimba_camera::AvtVimbaCamera::defaultFrameCallback) {
   void setCallback(frameCallbackFunc callback) {
     userFrameCallback = callback;
   }
@@ -110,6 +108,8 @@ class AvtVimbaCamera {
   void startImaging(void);
   void stopImaging(void);
   bool isOpened(void) { return opened_; }
+
+  rclcpp::Node::SharedPtr node_handle_;  // 2021
 
 private:
   Config config_;
@@ -127,7 +127,7 @@ private:
   VmbInt64_t vimba_camera_max_height_;
 
   // Mutex
-//np  boost::mutex config_mutex_;
+  //np  boost::mutex config_mutex_;
 
   bool opened_;
   bool streaming_;
@@ -144,8 +144,6 @@ private:
   std::chrono::steady_clock::time_point last_frame_;
   std::shared_ptr<camera_info_manager::CameraInfoManager> cinfo_manager_;
   image_transport::CameraPublisher camera_info_pub_;
-  //std::shared_ptr<sensor_msgs::msg::Image> image_msg_;
-  //std::shared_ptr<sensor_msgs::msg::Image> ConvertFrameToMessage(cv::Mat & frame);
   std::shared_ptr<sensor_msgs::msg::Image> ConvertFrameToMessage(int & frame);
   void ImageCallback();
 
@@ -156,7 +154,6 @@ private:
   std::string trigger_source_;
   int trigger_source_int_;
 
-  // ROS2 support
 
   CameraPtr openCamera(std::string id_str);
 
@@ -167,9 +164,9 @@ private:
   //}
 
   template<typename T>
-  bool setFeatureValue(const std::string& feature_str, const T& val);
+    bool setFeatureValue(const std::string& feature_str, const T& val);
   template<typename T>
-  bool getFeatureValue(const std::string& feature_str, T& val);
+    bool getFeatureValue(const std::string& feature_str, T& val);
   bool getFeatureValue(const std::string& feature_str, std::string& val);
   bool runCommand(const std::string& command_str);
   std::string interfaceToString(VmbInterfaceType interfaceType);

@@ -43,10 +43,10 @@ MonoCamera::MonoCamera(const rclcpp::NodeOptions &node_options) :
     // Start Vimba & list all available cameras
     api_.start();
 
+    node_handle_ = rclcpp::Node::make_shared("avt_vimba_camera");
+    cam_.node_handle_ = this->node_handle_; // 2021
+
     // set up config from parms
-    //node_handle_ = rclcpp::Node::make_shared("avt_vimba_camera");
-    //camera_parms_ = std::make_shared<avt_vimba_camera::AvtVimbaCameraParms>(node_handle_);
-    //std::cout << "Test: " << camera_parms_->frame_id_descriptor.description << std::endl;
   	frame_id_descriptor.description = "The optical camera TF frame set in message headers.";
   	this->declare_parameter("frame_id", rclcpp::ParameterValue("camera"), frame_id_descriptor);
   	trig_timestamp_topic_descriptor.description = "Sets the topic from which an externally trigged camera receives its trigger timestamps.";
@@ -528,7 +528,6 @@ rcl_interfaces::msg::SetParametersResult MonoCamera::parametersCallback (
 }
 
 void MonoCamera::frameCallback(const FramePtr& vimba_frame_ptr) {
-  //np ros::Time ros_time = ros::Time::now();
   rclcpp::Time ros_time = ros_clock_.now();
 
   if (camera_info_pub_.getNumSubscribers() > 0) {
@@ -539,8 +538,7 @@ void MonoCamera::frameCallback(const FramePtr& vimba_frame_ptr) {
       img.header.frame_id = ci.header.frame_id;
       camera_info_pub_.publish(img, ci);
     } else {
-      //np ROS_WARN_STREAM("Function frameToImage returned 0. No image published.");
-      std::cout << "Function frameToImage returned 0. No image published." << std::endl;
+      RCLCPP_WARN(this->get_logger(), "Function frameToImage returned 0. No image published.");
     }
   }
   // updater_.update();
@@ -571,8 +569,7 @@ void MonoCamera::configure(Config& newconfig, uint32_t level) {
     cam_.updateConfig(newconfig);
     updateCameraInfo(config);
   } catch (const std::exception& e) {
-    //np ROS_ERROR_STREAM("Error reconfiguring mono_camera node : " << e.what());
-    std::cout << "Error reconfiguring mono_camera node : " << e.what() << std::endl;
+    RCLCPP_ERROR_STREAM(this->get_logger(), "Error reconfiguring mono_camera node : " << e.what());
   }
 }
 
@@ -609,8 +606,7 @@ void MonoCamera::updateCameraInfo(const avt_vimba_camera::AvtVimbaCameraConfig& 
       info_man_->loadCameraInfo(camera_info_url);
       ci = info_man_->getCameraInfo();
     } else {
-      //np ROS_WARN_STREAM("Camera info URL not valid: " << camera_info_url);
-      std::cout << "Camera info URL not valid: " << camera_info_url << std::endl;
+      RCLCPP_WARN_STREAM(this->get_logger(), "Camera info URL not valid: " << camera_info_url);
     }
   }
 
