@@ -6,6 +6,8 @@ lib/
 bin/
 build/
 docs/
+install/
+log/
 
 # Auto generated code
 cfg/cpp/
@@ -30,4 +32,6 @@ src/*/CMakeFiles/
 .tags*
 */.tags*
 
-
+# misc
+.vscode
+Vimba_4_1/
