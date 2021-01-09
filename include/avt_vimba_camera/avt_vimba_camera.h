@@ -109,7 +109,7 @@ class AvtVimbaCamera {
   void stopImaging(void);
   bool isOpened(void) { return opened_; }
 
-  rclcpp::Node::SharedPtr node_handle_;  // 2021
+  rclcpp::Node::SharedPtr node_handle_;
 
 private:
   Config config_;

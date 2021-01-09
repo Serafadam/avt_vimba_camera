@@ -60,6 +60,7 @@ private:
     // Camera parameters
     // std::shared_ptr<avt_vimba_camera::AvtVimbaCameraParms> camera_parms_;
   	rcl_interfaces::msg::ParameterDescriptor frame_id_descriptor;
+  	rcl_interfaces::msg::ParameterDescriptor camera_ip_addr_descriptor;
   	rcl_interfaces::msg::ParameterDescriptor trig_timestamp_topic_descriptor;
   	rcl_interfaces::msg::ParameterDescriptor acquisition_mode_descriptor;
   	rcl_interfaces::msg::ParameterDescriptor acquisition_rate_descriptor;

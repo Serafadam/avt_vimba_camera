@@ -355,6 +355,7 @@ class DEFAULT
 #endif // np
 
     std::string frame_id_;
+    std::string camera_ip_addr;
     std::string trig_timestamp_topic;
     std::string acquisition_mode;
     double acquisition_rate;

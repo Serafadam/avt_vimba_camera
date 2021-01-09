@@ -3,6 +3,7 @@ avt_vimba_camera:
     width: 640
     height: 400
     frame_id: map
+    camera_ip_addr: 192.168.1.16
     acquisition_mode: Continuous
     acquisition_rate: 30
     balance_ratio_abs: 1.0

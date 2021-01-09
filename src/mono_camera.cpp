@@ -44,11 +44,13 @@ MonoCamera::MonoCamera(const rclcpp::NodeOptions &node_options) :
     api_.start();
 
     node_handle_ = rclcpp::Node::make_shared("avt_vimba_camera");
-    cam_.node_handle_ = this->node_handle_; // 2021
+    cam_.node_handle_ = this->node_handle_;
 
     // set up config from parms
   	frame_id_descriptor.description = "The optical camera TF frame set in message headers.";
   	this->declare_parameter("frame_id", rclcpp::ParameterValue("camera"), frame_id_descriptor);
+  	camera_ip_addr_descriptor.description = "The IP address for the camera.";
+  	this->declare_parameter("camera_ip_addr", rclcpp::ParameterValue("10.0.0.1"), camera_ip_addr_descriptor);
   	trig_timestamp_topic_descriptor.description = "Sets the topic from which an externally trigged camera receives its trigger timestamps.";
   	this->declare_parameter("trig_timestamp_topic", rclcpp::ParameterValue(""), trig_timestamp_topic_descriptor);
   	acquisition_mode_descriptor.description = "Camera acquisition mode";
@@ -170,9 +172,8 @@ MonoCamera::MonoCamera(const rclcpp::NodeOptions &node_options) :
    * parms into the camera configuration at startup.  The call below will fail if the
    * yaml file isn't used or doesn't line up perfectly.
    */
-  ip_ = std::string("192.168.1.16");  // [neil-rti] FIXME: need a config option
     parametersCallback(this->get_parameters({
-      "height", "width", "acquisition_mode", "acquisition_rate", "balance_ratio_abs", 
+      "height", "width", "camera_ip_addr", "acquisition_mode", "acquisition_rate", "balance_ratio_abs", 
       "balance_ratio_selector", "binning_x", "binning_y", "decimation_x", "decimation_y", 
       "exposure", "exposure_auto", "exposure_auto_alg", "exposure_auto_max", "exposure_auto_min", 
       "exposure_auto_outliers", "exposure_auto_rate", "exposure_auto_target", "exposure_auto_tol", 
@@ -214,6 +215,12 @@ rcl_interfaces::msg::SetParametersResult MonoCamera::parametersCallback (
     {
       camera_config_.frame_id_ = parameter.as_string();
       RCLCPP_INFO(this->get_logger(), "Parameter 'frame_id' changed to: %s", camera_config_.frame_id_.c_str()); 
+    }
+    else if (parameter.get_name() == "camera_ip_addr" &&
+        parameter.get_type() == rclcpp::ParameterType::PARAMETER_STRING)
+    {
+      camera_config_.camera_ip_addr = parameter.as_string();
+      RCLCPP_INFO(this->get_logger(), "Parameter 'camera_ip_addr' changed to: %s", camera_config_.camera_ip_addr.c_str()); 
     }
     else if (parameter.get_name() == "trig_timestamp_topic" &&
         parameter.get_type() == rclcpp::ParameterType::PARAMETER_STRING)
@@ -522,6 +529,7 @@ rcl_interfaces::msg::SetParametersResult MonoCamera::parametersCallback (
       RCLCPP_INFO(this->get_logger(), "Parameter 'iris_video_level_max' changed to: %d", camera_config_.iris_video_level_max); 
     }
   }
+
   // update the camera
   configure(camera_config_, 0);
   return result;
@@ -559,6 +567,12 @@ void MonoCamera::configure(Config& newconfig, uint32_t level) {
     if (newconfig.frame_id_ == "") {
       newconfig.frame_id_ = "camera";
     }
+
+    // see if ip addr has changed
+    if (newconfig.camera_ip_addr != ip_) {
+      ip_ = newconfig.camera_ip_addr;
+    }
+
     // The camera already stops & starts acquisition
     // so there's no problem on changing any feature.
     if (!cam_.isOpened()) {
