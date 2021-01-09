@@ -33,8 +33,8 @@
 #include <avt_vimba_camera/avt_vimba_camera.h>
 #include <avt_vimba_camera/avt_vimba_api.h>
 
-//np #include <ros/ros.h>
-//np #include <ros/console.h>
+//ros1 #include <ros/ros.h>
+//ros1 #include <ros/console.h>
 #include "rclcpp/logger.hpp"
 #include "rcutils/logging_macros.h"
 #include "rclcpp/utilities.hpp"
@@ -62,7 +62,7 @@ static const char* FeatureDataType[] = {
   "string",
   "bool"};
 
-#if 0 //np: needed?
+#if 0 //ros1: needed?
 static const char* AutoMode[] = {
   "Off",
   "Once",
@@ -120,7 +120,7 @@ void intHandler(int dummy) {
     keepRunning = 0;
 }
 
-//np AvtVimbaCamera::AvtVimbaCamera() : AvtVimbaCamera(ros::this_node::getName().c_str()) {}
+//ros1 AvtVimbaCamera::AvtVimbaCamera() : AvtVimbaCamera(ros::this_node::getName().c_str()) {}
 AvtVimbaCamera::AvtVimbaCamera() : AvtVimbaCamera("avt_vimba_camera") {}
 
 AvtVimbaCamera::AvtVimbaCamera(std::string name) {
@@ -133,15 +133,15 @@ AvtVimbaCamera::AvtVimbaCamera(std::string name) {
 
   camera_state_ = OPENING;
 
-  //np updater_.setHardwareID("unknown");
-  //np updater_.add(name_, this, &AvtVimbaCamera::getCurrentState);
-  //np updater_.update();
+  //ros1 updater_.setHardwareID("unknown");
+  //ros1 updater_.add(name_, this, &AvtVimbaCamera::getCurrentState);
+  //ros1 updater_.update();
 }
 
 void AvtVimbaCamera::start(std::string ip_str, std::string guid_str, bool debug_prints) {
   if (opened_) return;
   show_debug_prints_ = debug_prints;
-  //np updater_.broadcast(0, "Starting device with IP:" + ip_str + " or GUID:" + guid_str);
+  //ros1 updater_.broadcast(0, "Starting device with IP:" + ip_str + " or GUID:" + guid_str);
   std::cout << "Starting device with IP:" << ip_str << " or GUID:" << guid_str << std::endl;
 
   // Determine which camera to use. Try IP first
@@ -154,7 +154,7 @@ void AvtVimbaCamera::start(std::string ip_str, std::string guid_str, bool debug_
       RCLCPP_WARN_STREAM(node_handle_->get_logger(), "Camera pointer is empty. Returning...");
       return;
     }
-    //np updater_.setHardwareID(ip_str);
+    //ros1 updater_.setHardwareID(ip_str);
     guid_ = ip_str;
     // If both guid and IP are available, open by IP and check guid
     if (!guid_str.empty()) {
@@ -165,7 +165,7 @@ void AvtVimbaCamera::start(std::string ip_str, std::string guid_str, bool debug_
         return;
       }
       assert(cam_guid_str == guid_str);
-      //np updater_.setHardwareID(guid_str);
+      //ros1 updater_.setHardwareID(guid_str);
       guid_ = guid_str;
       diagnostic_msg_ = "GUID " + cam_guid_str + " matches for camera with IP: " + ip_str;
       RCLCPP_INFO_STREAM(node_handle_->get_logger(), "GUID " << cam_guid_str << " matches for camera with IP: " << ip_str);
@@ -175,7 +175,7 @@ void AvtVimbaCamera::start(std::string ip_str, std::string guid_str, bool debug_
     diagnostic_msg_ = "Trying to open camera by ID: " + guid_str;
     RCLCPP_INFO_STREAM(node_handle_->get_logger(), "Trying to open camera by ID: " << guid_str);
     vimba_camera_ptr_ = openCamera(guid_str);
-    //np updater_.setHardwareID(guid_str);
+    //ros1 updater_.setHardwareID(guid_str);
     guid_ = guid_str;
   } else {
     // No identifying info (GUID and IP) are available
@@ -183,7 +183,7 @@ void AvtVimbaCamera::start(std::string ip_str, std::string guid_str, bool debug_
     RCLCPP_ERROR(node_handle_->get_logger(), "Can't connect to the camera: at least GUID or IP need to be set.");
     camera_state_ = ERROR;
   }
-  //np updater_.update();
+  //ros1 updater_.update();
 
   // From the SynchronousGrab API example:
   // TODO Set the GeV packet size to the highest possible value
@@ -201,7 +201,7 @@ void AvtVimbaCamera::start(std::string ip_str, std::string guid_str, bool debug_
       trigger_source_int == FixedRate ||
       trigger_source_int == SyncIn1) {
     // Create a frame observer for this camera
-    //np SP_SET(frame_obs_ptr_, new FrameObserver(vimba_camera_ptr_, boost::bind(&avt_vimba_camera::AvtVimbaCamera::frameCallback, this, _1)));
+    //ros1 SP_SET(frame_obs_ptr_, new FrameObserver(vimba_camera_ptr_, boost::bind(&avt_vimba_camera::AvtVimbaCamera::frameCallback, this, _1)));
     SP_SET(frame_obs_ptr_, new FrameObserver(
       vimba_camera_ptr_, 
       std::bind(&avt_vimba_camera::AvtVimbaCamera::frameCallback, this, std::placeholders::_1)));
@@ -216,7 +216,7 @@ void AvtVimbaCamera::start(std::string ip_str, std::string guid_str, bool debug_
                     " not implemented.");
     camera_state_ = ERROR;
   }
-  //np updater_.update();
+  //ros1 updater_.update();
 }
 
 void AvtVimbaCamera::startImaging(void) {
@@ -242,7 +242,7 @@ void AvtVimbaCamera::startImaging(void) {
   } else {
     RCLCPP_WARN_STREAM(node_handle_->get_logger(), "Start imaging called, but the camera is already imaging(" << frame_id_ << ").");
   }
-  //np updater_.update();
+  //ros1 updater_.update();
 }
 
 void AvtVimbaCamera::stopImaging(void) {
@@ -265,17 +265,17 @@ void AvtVimbaCamera::stopImaging(void) {
   } else {
     RCLCPP_WARN_STREAM(node_handle_->get_logger(), "Stop imaging called, but the camera is already stopped (" << frame_id_ << ").");
   }
-  //np updater_.update();
+  //ros1 updater_.update();
 }
 
 void AvtVimbaCamera::updateConfig(Config& config) {
-  //np boost::mutex::scoped_lock lock(config_mutex_);
+  //ros1 boost::mutex::scoped_lock lock(config_mutex_);
 
   frame_id_ =  config.frame_id_;
 
   if (streaming_) {
     stopImaging();
-    //np ros::Duration(0.5).sleep(); // sleep for half a second
+    //ros1 ros::Duration(0.5).sleep(); // sleep for half a second
     std::this_thread::sleep_for(std::chrono::milliseconds(500));
   }
 
@@ -347,7 +347,7 @@ CameraPtr AvtVimbaCamera::openCamera(std::string id_str) {
     if (keepRunning) {
       RCLCPP_WARN(node_handle_->get_logger(), "Could not open camera. Retrying every two seconds...");
       err = camera->Open(VmbAccessModeFull);
-      //np ros::Duration(2.0).sleep();
+      //ros1 ros::Duration(2.0).sleep();
       std::this_thread::sleep_for(std::chrono::seconds(2));
     } else {
       RCLCPP_ERROR_STREAM(node_handle_->get_logger(), "[" << name_
@@ -383,27 +383,27 @@ CameraPtr AvtVimbaCamera::openCamera(std::string id_str) {
     << "\n\t\t * Access   : " << accessModeToString(accessMode));
   }
 
-  //np ros::Duration(2.0).sleep();
+  //ros1 ros::Duration(2.0).sleep();
   std::this_thread::sleep_for(std::chrono::seconds(2));
 
-  //np printAllCameraFeatures(camera);
+  //ros1 printAllCameraFeatures(camera);
   opened_ = true;
   camera_state_ = IDLE;
   return camera;
 }
 
 void AvtVimbaCamera::frameCallback(const FramePtr vimba_frame_ptr) {
-  //np boost::mutex::scoped_lock lock(config_mutex_);
+  //ros1 boost::mutex::scoped_lock lock(config_mutex_);
 
   camera_state_ = OK;
   diagnostic_msg_ = "Camera operating normally";
 
   // Call the callback implemented by other classes
-  //np boost::thread thread_callback = boost::thread(userFrameCallback, vimba_frame_ptr);  
-  //np thread_callback.join();
+  //ros1 boost::thread thread_callback = boost::thread(userFrameCallback, vimba_frame_ptr);  
+  //ros1 thread_callback.join();
   userFrameCallback(vimba_frame_ptr);
 
-  //np updater_.update();
+  //ros1 updater_.update();
 }
 
 double AvtVimbaCamera::getDeviceTemp(void) {
@@ -624,7 +624,7 @@ bool AvtVimbaCamera::runCommand(const std::string& command_str) {
         }
         if(show_debug_prints_) {
           /* INFO_S_T */ std::cout << "Waiting for command "
-            //np << command_str.c_str() << "..." << std::endl;
+            //ros1 << command_str.c_str() << "..." << std::endl;
             << "..." << std::endl;
         }
       } while ( false == is_command_done );
@@ -1234,7 +1234,7 @@ void AvtVimbaCamera::updateGPIOConfig(Config& config) {
   }
 }
 
-#if 0 //np
+#if 0 //ros1
 void AvtVimbaCamera::getCurrentState(diagnostic_updater::DiagnosticStatusWrapper &stat) {
   stat.add("Serial", guid_);
   stat.add("Info", diagnostic_msg_);
@@ -1275,5 +1275,5 @@ void AvtVimbaCamera::getCurrentState(diagnostic_updater::DiagnosticStatusWrapper
   }
 }
 
-#endif //np
+#endif //ros1
 }

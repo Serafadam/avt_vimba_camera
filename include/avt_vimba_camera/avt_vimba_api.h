@@ -58,12 +58,10 @@ class AvtVimbaApi {
   void start() {
     VmbErrorType err = vs.Startup();
     if (VmbErrorSuccess == err) {
-      //np RCLCPP_ERROR_STREAM("[Vimba System]: AVT Vimba System initialized successfully");      
-      std::cout << "[Vimba System]: AVT Vimba System initialized successfully" << std::endl;
+      RCLCPP_INFO_STREAM(node_handle_->get_logger(), "[Vimba System]: AVT Vimba System initialized successfully");      
       listAvailableCameras();
     } else {
-      //np RCLCPP_ERROR_STREAM("[Vimba System]: Could not start Vimba system: " << errorCodeToMessage(err));
-      std::cout << "[Vimba System]: Could not start Vimba system: " << errorCodeToMessage(err) << std::endl;
+      RCLCPP_ERROR_STREAM(node_handle_->get_logger(), "[Vimba System]: Could not start Vimba system: " << errorCodeToMessage(err));
     }
   }
 
@@ -71,9 +69,9 @@ class AvtVimbaApi {
   void shutdown() {
     VmbErrorType err = vs.Shutdown();
     if (VmbErrorSuccess == err) {
-      std::cout << "[Vimba System]: AVT Vimba System shut down successfully" << std::endl;
+      RCLCPP_INFO_STREAM(node_handle_->get_logger(), "[Vimba System]: AVT Vimba System shut down successfully");
     } else {
-      std::cout << "[Vimba System]: Could not shut down Vimba system: " << errorCodeToMessage(err) << std::endl;
+      RCLCPP_ERROR_STREAM(node_handle_->get_logger(), "[Vimba System]: Could not shut down Vimba system: " << errorCodeToMessage(err));
     }
 
   }
@@ -160,8 +158,7 @@ class AvtVimbaApi {
     else if (pixel_format == VmbPixelFormatRgb12          ) encoding = sensor_msgs::image_encodings::TYPE_16UC3;
     else if (pixel_format == VmbPixelFormatRgb16          ) encoding = sensor_msgs::image_encodings::TYPE_16UC3;
     else {
-      //np RCLCPP_WARN_ONCE(rclcpp::Node::get_logger(), "Received frame with unsupported pixel format %d", pixel_format);
-      std::cout << "Received frame with unsupported pixel format " << pixel_format << std::endl;
+      RCLCPP_WARN_ONCE(node_handle_->get_logger(), "Received frame with unsupported pixel format %d", pixel_format);
     }
     if (encoding == "") return false;
 
@@ -176,19 +173,14 @@ class AvtVimbaApi {
                                    step,
                                    buffer_ptr);
     } else {
-#if 0 //np
-      ROS_ERROR_STREAM("[" << ros::this_node::getName()
+      RCLCPP_ERROR_STREAM(node_handle_->get_logger(), "[" << "rclcpp::Node::get_name()"
         << "]: Could not GetImage. "
         << "\n Error: " << errorCodeToMessage(err));
-#else
-      std::cout << "[" << "rclcpp::Node::get_name()"
-        << "]: Could not GetImage. "
-        << "\n Error: " << errorCodeToMessage(err) << std::endl;
-#endif  //np
     }
     return res;
   }
 
+  rclcpp::Node::SharedPtr node_handle_;
  private:
   VimbaSystem& vs;
 
@@ -201,11 +193,7 @@ class AvtVimbaApi {
         cameras.end() != iter;
         ++iter) {
           if (VmbErrorSuccess == (*iter)->GetName(name)) {
-#if 0 //np
-            ROS_DEBUG_STREAM("[" << ros::this_node::getName() << "]: Found camera: ");
-#else
-            std::cout << "[" << "rclcpp::Node::get_name()" << "]: Found camera: " << std::endl;
-#endif  //np
+            RCLCPP_DEBUG_STREAM(node_handle_->get_logger(), "[" << "rclcpp::Node::get_name()" << "]: Found camera: ");
           }
           std::string strID;            // The ID of the cam
           std::string strName;          // The name of the cam
@@ -215,79 +203,42 @@ class AvtVimbaApi {
           VmbErrorType err = (*iter)->GetID( strID );
           if ( VmbErrorSuccess != err )
           {
-#if 0 //np
-              ROS_ERROR_STREAM("[Could not get camera ID. Error code: " << err << "]");
-#else
-              std::cout << "[Could not get camera ID. Error code: " << err << "]" << std::endl;
-#endif  //np
+              RCLCPP_ERROR_STREAM(node_handle_->get_logger(), "[Could not get camera ID. Error code: " << err << "]");
           }
           err = (*iter)->GetName( strName );
           if ( VmbErrorSuccess != err )
           {
-#if 0 //np
-              ROS_ERROR_STREAM("[Could not get camera name. Error code: " << err << "]");
-#else
-              std::cout << "[Could not get camera name. Error code: " << err << "]" << std::endl;
-#endif  //np
+              RCLCPP_ERROR_STREAM(node_handle_->get_logger(), "[Could not get camera name. Error code: " << err << "]");
           }
 
           err = (*iter)->GetModel( strModelname );
           if ( VmbErrorSuccess != err )
           {
-#if 0 //np
-              ROS_ERROR_STREAM("[Could not get camera mode name. Error code: " << err << "]");
-#else
-              std::cout << "[Could not get camera mode name. Error code: " << err << "]" << std::endl;
-#endif  //np
+              RCLCPP_ERROR_STREAM(node_handle_->get_logger(), "[Could not get camera mode name. Error code: " << err << "]");
           }
 
           err = (*iter)->GetSerialNumber( strSerialNumber );
           if ( VmbErrorSuccess != err )
           {
-#if 0 //np
-              ROS_ERROR_STREAM("[Could not get camera serial number. Error code: " << err << "]");
-#else
-              std::cout << "[Could not get camera serial number. Error code: " << err << "]" << std::endl;
-#endif  //np
+              RCLCPP_ERROR_STREAM(node_handle_->get_logger(), "[Could not get camera serial number. Error code: " << err << "]");
           }
 
           err = (*iter)->GetInterfaceID( strInterfaceID );
           if ( VmbErrorSuccess != err )
           {
-#if 0 //np
-              ROS_ERROR_STREAM("[Could not get interface ID. Error code: " << err << "]");
-#else
-              std::cout << "[Could not get interface ID. Error code: " << err << "]" << std::endl;
-#endif  //np
+              RCLCPP_ERROR_STREAM(node_handle_->get_logger(), "[Could not get interface ID. Error code: " << err << "]");
           }
-#if 0 //np
-          ROS_INFO_STREAM("\t/// Camera Name: " << strName);
-          ROS_INFO_STREAM("\t/// Model Name: " << strModelname);
-          ROS_INFO_STREAM("\t/// Camera ID: " << strID);
-          ROS_INFO_STREAM("\t/// Serial Number: " << strSerialNumber);
-          ROS_INFO_STREAM("\t/// @ Interface ID: " << strInterfaceID);
-#else
-          std::cout << "\t/// Camera Name: " << strName << std::endl;
-          std::cout << "\t/// Model Name: " << strModelname << std::endl;
-          std::cout << "\t/// Camera ID: " << strID << std::endl;
-          std::cout << "\t/// Serial Number: " << strSerialNumber << std::endl;
-          std::cout << "\t/// @ Interface ID: " << strInterfaceID << std::endl;
-#endif  //np
-
+          RCLCPP_INFO_STREAM(node_handle_->get_logger(), "\t/// Camera Name: " << strName);
+          RCLCPP_INFO_STREAM(node_handle_->get_logger(), "\t/// Model Name: " << strModelname);
+          RCLCPP_INFO_STREAM(node_handle_->get_logger(), "\t/// Camera ID: " << strID);
+          RCLCPP_INFO_STREAM(node_handle_->get_logger(), "\t/// Serial Number: " << strSerialNumber);
+          RCLCPP_INFO_STREAM(node_handle_->get_logger(), "\t/// @ Interface ID: " << strInterfaceID);
         }
       } else {
-#if 0 //np
-        ROS_WARN("Could not get cameras from Vimba System");
-#else
-        std::cout << "Could not get cameras from Vimba System" << std::endl;
-#endif  //np
+        RCLCPP_WARN_STREAM(node_handle_->get_logger(), "Could not get cameras from Vimba System");
       }
     } else {
-#if 0 //np
-      ROS_WARN("Could not start Vimba System");
-#else
-      std::cout << "Could not start Vimba System" << std::endl;
-#endif  //np
+      RCLCPP_WARN_STREAM(node_handle_->get_logger(), "Could not start Vimba System");
     }
   }
 };

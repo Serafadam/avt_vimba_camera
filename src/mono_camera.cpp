@@ -40,11 +40,13 @@ MonoCamera::MonoCamera(const rclcpp::NodeOptions &node_options) :
     Node("avt_vimba_camera", node_options)
     //nh_(nh), nhp_(nhp), it_(nhp), cam_(ros::this_node::getName()) 
 {
-    // Start Vimba & list all available cameras
-    api_.start();
-
+    // node handle sharing (for logging)
     node_handle_ = rclcpp::Node::make_shared("avt_vimba_camera");
     cam_.node_handle_ = this->node_handle_;
+    api_.node_handle_ = this->node_handle_;
+
+    // Start Vimba & list all available cameras
+    api_.start();
 
     // set up config from parms
   	frame_id_descriptor.description = "The optical camera TF frame set in message headers.";
@@ -187,14 +189,14 @@ MonoCamera::MonoCamera(const rclcpp::NodeOptions &node_options) :
     }));
 
   // Start dynamic_reconfigure & run configure()
-  //np reconfigure_server_.setCallback(boost::bind(&avt_vimba_camera::MonoCamera::configure, this, _1, _2));
+  //ros1 reconfigure_server_.setCallback(boost::bind(&avt_vimba_camera::MonoCamera::configure, this, _1, _2));
   configure(camera_config_, 0);
 
 }
 
 MonoCamera::~MonoCamera(void) {
   api_.shutdown();
-  //np pub_.shutdown();
+  //ros1 pub_.shutdown();
 }
 
 /**
@@ -613,7 +615,7 @@ void MonoCamera::updateCameraInfo(const avt_vimba_camera::AvtVimbaCameraConfig& 
 
   // set the new URL and load CameraInfo (if any) from it
   std::string camera_info_url;
-  //np nhp_.getParam("camera_info_url", camera_info_url);
+  //ros1 nhp_.getParam("camera_info_url", camera_info_url);
   if (camera_info_url != camera_info_url_) {
     info_man_->setCameraName(config.frame_id_);
     if (info_man_->validateURL(camera_info_url)) {

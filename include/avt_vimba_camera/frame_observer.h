@@ -33,7 +33,7 @@
 #ifndef FRAME_OBSERVER_H
 #define FRAME_OBSERVER_H
 
-//np #include <boost/function.hpp>
+//ros1 #include <boost/function.hpp>
 
 #include <VimbaCPP/Include/VimbaCPP.h>
 #include <functional>
@@ -44,7 +44,7 @@ class FrameObserver : virtual public IFrameObserver
 {
   public:
 
-    //np typedef boost::function<void (const FramePtr vimba_frame_ptr)> Callback;
+    //ros1 typedef boost::function<void (const FramePtr vimba_frame_ptr)> Callback;
     typedef std::function<void (const FramePtr vimba_frame_ptr)> Callback;
 
     // We pass the camera that will deliver the frames to the constructor

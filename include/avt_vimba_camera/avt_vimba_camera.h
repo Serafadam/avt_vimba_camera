@@ -127,7 +127,7 @@ private:
   VmbInt64_t vimba_camera_max_height_;
 
   // Mutex
-  //np  boost::mutex config_mutex_;
+  //ros1  boost::mutex config_mutex_;
 
   bool opened_;
   bool streaming_;
@@ -135,7 +135,7 @@ private:
   bool show_debug_prints_;
   std::string name_;
 
-//np  diagnostic_updater::Updater updater_;
+//ros1  diagnostic_updater::Updater updater_;
   CameraState camera_state_;
   std::string diagnostic_msg_;
 
@@ -186,7 +186,7 @@ private:
   void updateGPIOConfig(Config& config);
   void updateIrisConfig(Config& config);
 
-  //np void getCurrentState(diagnostic_updater::DiagnosticStatusWrapper &stat);
+  //ros1 void getCurrentState(diagnostic_updater::DiagnosticStatusWrapper &stat);
 
 };
 }
