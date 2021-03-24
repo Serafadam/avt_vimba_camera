@@ -7,14 +7,14 @@ This driver was ported from the ROS(1) driver at [AutonomouStuff GitHub](https:/
 ## Building the driver
 
 Driver can be built by ensuring the [ROS2 image_common](https://github.com/ros-perception/image_common/tree/ros2) 
-repo is installed and built, cloning this repository, then installing the Vimba SDK (default location is ./Vimba_4_1 in this repository; edit the CMakeLists.txt file to point to the SDK installation
+repo is installed and built, cloning this repository, then installing the Vimba SDK (default location is ./Vimba_4_2 in this repository; edit the CMakeLists.txt file to point to the SDK installation
 location if installed in a different location).  
 Then source your ROS2 installation and build as usual.  
 For example:
 ```
 git clone https://github.com/<this-repo>/avt_vimba_camera.git
 cd avt_vimba_camera
-(copy the Vimba SDK to ./Vimba_4_1, or edit CMakeLists.txt to point to alternate SDK location)
+(copy the Vimba SDK to ./Vimba_4_2, or edit CMakeLists.txt to point to alternate SDK location)
 source (ros2 installation)
 source (image_common)
 colcon build --symlink-install
