@@ -36,12 +36,11 @@
 
 namespace avt_vimba_camera {
 
-MonoCamera::MonoCamera(const rclcpp::NodeOptions &node_options) : 
-    Node("avt_vimba_camera", node_options)
-    //nh_(nh), nhp_(nhp), it_(nhp), cam_(ros::this_node::getName()) 
+MonoCamera::MonoCamera(const std::string & node_name, const rclcpp::NodeOptions &node_options)
+: Node(node_name, node_options)
 {
     // node handle sharing (for logging)
-    node_handle_ = rclcpp::Node::make_shared("avt_vimba_camera");
+    node_handle_ = rclcpp::Node::SharedPtr(this);
     cam_.node_handle_ = this->node_handle_;
     api_.node_handle_ = this->node_handle_;
 

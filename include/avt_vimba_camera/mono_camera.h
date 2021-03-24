@@ -39,7 +39,7 @@ namespace avt_vimba_camera
 {
 class MonoCamera : public rclcpp::Node {
 public:
-    explicit MonoCamera(const rclcpp::NodeOptions&);
+    explicit MonoCamera(const std::string & node_name, const rclcpp::NodeOptions&);
     ~MonoCamera();
 
     rclcpp::Node::SharedPtr node_handle_;

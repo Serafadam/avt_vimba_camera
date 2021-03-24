@@ -11,7 +11,7 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 endif()
 
 # [neil-rti]: set to directory of Vimba SDK 
-set(VIMBA_DIR Vimba_4_1)
+set(VIMBA_DIR Vimba_4_2)
 
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)

@@ -33,7 +33,7 @@ int main(int argc, char * argv[])
     rclcpp::NodeOptions options;
     options.use_intra_process_comms(false);
 
-    auto avt_vimba_camera = std::make_shared<avt_vimba_camera::MonoCamera>(options);
+    auto avt_vimba_camera = std::make_shared<avt_vimba_camera::MonoCamera>("avt_vimba_camera", options);
     
     exec.add_node(avt_vimba_camera);
     
