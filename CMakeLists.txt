@@ -84,13 +84,12 @@ function(add_dependencies_and_linkings arg)
       VimbaC
       VimbaCPP
     )
-  else()
 
   else()
     message(FATAL_ERROR "[libvimba]: Architecture (${CMAKE_SYSTEM_PROCESSOR}) not suported. Exiting...")
   endif()
 endfunction(add_dependencies_and_linkings)
-
+link_directories(${VIMBA_DIR}/VimbaCPP/DynamicLib/arm_64bit)
 add_executable(mono_camera_node
   src/nodes/mono_camera_node.cpp
   src/mono_camera.cpp

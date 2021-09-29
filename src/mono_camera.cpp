@@ -52,6 +52,8 @@ MonoCamera::MonoCamera(const std::string & node_name, const rclcpp::NodeOptions 
   	this->declare_parameter("frame_id", rclcpp::ParameterValue("camera"), frame_id_descriptor);
   	camera_ip_addr_descriptor.description = "The IP address for the camera.";
   	this->declare_parameter("camera_ip_addr", rclcpp::ParameterValue(""), camera_ip_addr_descriptor);
+    guid_descriptor.description = "The IP address for the camera.";
+  	this->declare_parameter("guid", rclcpp::ParameterValue(""), guid_descriptor);
   	trig_timestamp_topic_descriptor.description = "Sets the topic from which an externally trigged camera receives its trigger timestamps.";
   	this->declare_parameter("trig_timestamp_topic", rclcpp::ParameterValue(""), trig_timestamp_topic_descriptor);
   	acquisition_mode_descriptor.description = "Camera acquisition mode";
@@ -174,7 +176,7 @@ MonoCamera::MonoCamera(const std::string & node_name, const rclcpp::NodeOptions 
    * yaml file isn't used or doesn't line up perfectly.
    */
     parametersCallback(this->get_parameters({
-      "height", "width", "camera_ip_addr", "acquisition_mode", "acquisition_rate", "balance_ratio_abs", 
+      "height", "width", "camera_ip_addr", "guid", "acquisition_mode", "acquisition_rate", "balance_ratio_abs", 
       "balance_ratio_selector", "binning_x", "binning_y", "decimation_x", "decimation_y", 
       "exposure", "exposure_auto", "exposure_auto_alg", "exposure_auto_max", "exposure_auto_min", 
       "exposure_auto_outliers", "exposure_auto_rate", "exposure_auto_target", "exposure_auto_tol", 
