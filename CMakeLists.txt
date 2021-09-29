@@ -11,7 +11,7 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 endif()
 
 # [neil-rti]: set to directory of Vimba SDK 
-set(VIMBA_DIR Vimba_4_2)
+set(VIMBA_DIR /opt/Vimba_5_0)
 
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
@@ -78,12 +78,18 @@ function(add_dependencies_and_linkings arg)
       VimbaC
       VimbaCPP
     )
+  elseif("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL aarch64)
+    link_directories(${VIMBA_DIR}/VimbaCPP/DynamicLib/arm_64bit)
+    target_link_libraries(${arg}
+      VimbaC
+      VimbaCPP
+    )
+  else()
+
   else()
     message(FATAL_ERROR "[libvimba]: Architecture (${CMAKE_SYSTEM_PROCESSOR}) not suported. Exiting...")
   endif()
 endfunction(add_dependencies_and_linkings)
-
-link_directories(${VIMBA_DIR}/VimbaCPP/DynamicLib/x86_64bit)
 
 add_executable(mono_camera_node
   src/nodes/mono_camera_node.cpp

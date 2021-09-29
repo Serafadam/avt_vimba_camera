@@ -51,7 +51,7 @@ MonoCamera::MonoCamera(const std::string & node_name, const rclcpp::NodeOptions 
   	frame_id_descriptor.description = "The optical camera TF frame set in message headers.";
   	this->declare_parameter("frame_id", rclcpp::ParameterValue("camera"), frame_id_descriptor);
   	camera_ip_addr_descriptor.description = "The IP address for the camera.";
-  	this->declare_parameter("camera_ip_addr", rclcpp::ParameterValue("10.0.0.1"), camera_ip_addr_descriptor);
+  	this->declare_parameter("camera_ip_addr", rclcpp::ParameterValue(""), camera_ip_addr_descriptor);
   	trig_timestamp_topic_descriptor.description = "Sets the topic from which an externally trigged camera receives its trigger timestamps.";
   	this->declare_parameter("trig_timestamp_topic", rclcpp::ParameterValue(""), trig_timestamp_topic_descriptor);
   	acquisition_mode_descriptor.description = "Camera acquisition mode";
@@ -155,7 +155,7 @@ MonoCamera::MonoCamera(const std::string & node_name, const rclcpp::NodeOptions 
   	iris_video_level_max_descriptor.description = "Maximum video iris level output by the camera, in approximately mV pp. A lower minimum value slows the adjustment time but prevents excessive overshoot.";
   	this->declare_parameter("iris_video_level_max", rclcpp::ParameterValue(110), iris_video_level_max_descriptor);
     // callback for parms
-    this->set_on_parameters_set_callback(
+    this->add_on_set_parameters_callback(
       std::bind(&MonoCamera::parametersCallback, this, std::placeholders::_1)
     );
 
@@ -222,6 +222,12 @@ rcl_interfaces::msg::SetParametersResult MonoCamera::parametersCallback (
     {
       camera_config_.camera_ip_addr = parameter.as_string();
       RCLCPP_INFO(this->get_logger(), "Parameter 'camera_ip_addr' changed to: %s", camera_config_.camera_ip_addr.c_str()); 
+    }
+    else if (parameter.get_name() == "guid" &&
+        parameter.get_type() == rclcpp::ParameterType::PARAMETER_STRING)
+    {
+      camera_config_.guid = parameter.as_string();
+      RCLCPP_INFO(this->get_logger(), "Parameter 'guid' changed to: %s", camera_config_.guid.c_str()); 
     }
     else if (parameter.get_name() == "trig_timestamp_topic" &&
         parameter.get_type() == rclcpp::ParameterType::PARAMETER_STRING)
@@ -572,6 +578,10 @@ void MonoCamera::configure(Config& newconfig, uint32_t level) {
     // see if ip addr has changed
     if (newconfig.camera_ip_addr != ip_) {
       ip_ = newconfig.camera_ip_addr;
+    }
+
+    if (newconfig.guid != guid_) {
+      ip_ = newconfig.guid;
     }
 
     // The camera already stops & starts acquisition
