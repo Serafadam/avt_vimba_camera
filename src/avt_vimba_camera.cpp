@@ -436,6 +436,7 @@ bool AvtVimbaCamera::getFeatureValue(const std::string& feature_str, T& val) {
   VmbErrorType err;
   FeaturePtr vimba_feature_ptr;
   VmbFeatureDataType data_type;
+  bool data_type_present;
   err = vimba_camera_ptr_->GetFeatureByName(feature_str.c_str(),
                                             vimba_feature_ptr);
   if (VmbErrorSuccess == err) {
@@ -446,7 +447,9 @@ bool AvtVimbaCamera::getFeatureValue(const std::string& feature_str, T& val) {
       if ( VmbErrorSuccess != err ) {
         std::cout << "[Could not get feature Data Type. Error code: "
                   << err << "]" << std::endl;
+        data_type_present=false;
       } else {
+        data_type_present=true;
         std::string strValue;
         switch ( data_type ) {
           case VmbFeatureDataBool:
@@ -487,11 +490,12 @@ bool AvtVimbaCamera::getFeatureValue(const std::string& feature_str, T& val) {
     RCLCPP_WARN_STREAM(node_handle_->get_logger(), "[" << name_
       << "]: Could not get feature " << feature_str);
   }
-  if (show_debug_prints_)
+  if (show_debug_prints_ && data_type_present)
     RCLCPP_INFO_STREAM(node_handle_->get_logger(), "Asking for feature "
       << feature_str << " with datatype "
       << FeatureDataType[data_type]
       << " and value " << val);
+
   return (VmbErrorSuccess == err);
 }
 
@@ -841,6 +845,7 @@ void AvtVimbaCamera::updateAcquisitionConfig(Config& config) {
     changed = true;
     double acquisition_frame_rate_limit;
     getFeatureValue("AcquisitionFrameRateLimit", acquisition_frame_rate_limit);
+    RCLCPP_INFO(node_handle_->get_logger(), "Got acquisition frame rate limit");
     if (acquisition_frame_rate_limit < config.acquisition_rate) {
       double rate = (double)floor(acquisition_frame_rate_limit);
       RCLCPP_WARN_STREAM(node_handle_->get_logger(), "Max frame rate allowed: " << acquisition_frame_rate_limit

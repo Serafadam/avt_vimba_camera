@@ -59,7 +59,7 @@ MonoCamera::MonoCamera(const std::string & node_name, const rclcpp::NodeOptions 
   	acquisition_mode_descriptor.description = "Camera acquisition mode";
   	this->declare_parameter("acquisition_mode", rclcpp::ParameterValue("Continuous"), acquisition_mode_descriptor);
   	acquisition_rate_descriptor.description = "Sets the expected triggering rate in externally triggered mode.";
-  	this->declare_parameter("acquisition_rate", rclcpp::ParameterValue(30), acquisition_rate_descriptor);
+  	this->declare_parameter("acquisition_rate", rclcpp::ParameterValue(30.0), acquisition_rate_descriptor);
   	trigger_source_descriptor.description = "Camera trigger source";
   	this->declare_parameter("trigger_source", rclcpp::ParameterValue("FixedRate"), trigger_source_descriptor);
   	trigger_mode_descriptor.description = "Camera trigger mode";
@@ -625,7 +625,7 @@ void MonoCamera::updateCameraInfo(const avt_vimba_camera::AvtVimbaCameraConfig& 
   ci.roi.width    = config.roi_width;
 
   // set the new URL and load CameraInfo (if any) from it
-  std::string camera_info_url;
+  std::string camera_info_url = "/local_ws/src/avt_vimba_camera/calibrations/calibration_50-0503343290.yaml";
   //ros1 nhp_.getParam("camera_info_url", camera_info_url);
   if (camera_info_url != camera_info_url_) {
     info_man_->setCameraName(config.frame_id_);
