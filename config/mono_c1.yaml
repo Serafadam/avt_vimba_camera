@@ -2,9 +2,9 @@ avt_vimba_camera:
   ros__parameters:
     width: 640
     height: 400
-    frame_id: map
+    frame_id: test
     camera_ip_addr: 192.168.1.16
-    guid: test
+    guid: DEV_1AB22C00BE17
     acquisition_mode: Continuous
     acquisition_rate: 30
     balance_ratio_abs: 1.0

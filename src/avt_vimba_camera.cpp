@@ -199,7 +199,8 @@ void AvtVimbaCamera::start(std::string ip_str, std::string guid_str, bool debug_
 
   if (trigger_source_int == Freerun   ||
       trigger_source_int == FixedRate ||
-      trigger_source_int == SyncIn1) {
+      trigger_source_int == SyncIn1 ||
+      trigger_source_int == Software) {
     // Create a frame observer for this camera
     //ros1 SP_SET(frame_obs_ptr_, new FrameObserver(vimba_camera_ptr_, boost::bind(&avt_vimba_camera::AvtVimbaCamera::frameCallback, this, _1)));
     SP_SET(frame_obs_ptr_, new FrameObserver(
@@ -849,6 +850,7 @@ void AvtVimbaCamera::updateAcquisitionConfig(Config& config) {
     setFeatureValue("AcquisitionFrameRateAbs",
                     static_cast<float>(config.acquisition_rate));
   }
+
   if (config.trigger_mode != config_.trigger_mode || on_init_) {
     changed = true;
     setFeatureValue("TriggerMode", config.trigger_mode.c_str());
