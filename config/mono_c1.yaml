@@ -4,7 +4,9 @@ avt_vimba_camera:
     height: 400
     frame_id: test
     camera_ip_addr: 192.168.1.16
-    guid: DEV_1AB22C00BE17
+    guid: DEV_1AB22C00F301
+    device_link_throughput_limit_mode: "On"
+    device_link_throughput_limit: 200000000
     acquisition_mode: Continuous
     acquisition_rate: 5.0
     balance_ratio_abs: 1.0
@@ -48,9 +50,9 @@ avt_vimba_camera:
     trig_timestamp_topic: ''
     trigger_activation: RisingEdge
     trigger_delay: 0.0
-    trigger_mode: 'On'
+    trigger_mode: 'Off'
     trigger_selector: FrameStart
-    trigger_source: FixedRate
+    trigger_source: Software
     use_sim_time: false
     whitebalance_auto: Continuous
     whitebalance_auto_rate: 100

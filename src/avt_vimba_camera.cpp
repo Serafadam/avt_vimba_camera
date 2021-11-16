@@ -287,6 +287,7 @@ void AvtVimbaCamera::updateConfig(Config& config) {
   if(show_debug_prints_) {
     RCLCPP_INFO_STREAM(node_handle_->get_logger(), "Updating configuration for camera " << config.frame_id_);
   }
+  updateDeviceLinkThroughput(config);
   updateExposureConfig(config);
   updateGainConfig(config);
   updateWhiteBalanceConfig(config);
@@ -832,6 +833,11 @@ void AvtVimbaCamera::printAllCameraFeatures(const CameraPtr& camera) {
   } else {
     std::cout << "Could not get features. Error code: " << api_.errorCodeToMessage(err) << std::endl;
   }
+}
+
+void AvtVimbaCamera::updateDeviceLinkThroughput(Config& config){
+  setFeatureValue("DeviceLinkThroughputLimitMode", config.device_link_throughput_limit_mode.c_str());
+  setFeatureValue("DeviceLinkThroughputLimit", config.device_link_throughput_limit);
 }
 
 /** Change the Trigger configuration */

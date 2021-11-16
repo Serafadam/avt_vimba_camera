@@ -357,6 +357,8 @@ class DEFAULT
     std::string frame_id_;
     std::string camera_ip_addr;
     std::string guid;
+    std::string device_link_throughput_limit_mode;
+    int device_link_throughput_limit;
     std::string trig_timestamp_topic;
     std::string acquisition_mode;
     double acquisition_rate;

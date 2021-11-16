@@ -174,6 +174,7 @@ private:
   int getTriggerModeInt(std::string mode_str);
   void printAllCameraFeatures(const CameraPtr& camera);
 
+  void updateDeviceLinkThroughput(Config& config);
   void updateAcquisitionConfig(Config& config);
   void updateExposureConfig(Config& config);
   void updateGainConfig(Config& config);

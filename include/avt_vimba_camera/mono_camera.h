@@ -113,6 +113,8 @@ private:
   	rcl_interfaces::msg::ParameterDescriptor iris_mode_descriptor;
   	rcl_interfaces::msg::ParameterDescriptor iris_video_level_min_descriptor;
   	rcl_interfaces::msg::ParameterDescriptor iris_video_level_max_descriptor;
+	rcl_interfaces::msg::ParameterDescriptor device_link_throughput_limit_mode_descriptor;
+  	rcl_interfaces::msg::ParameterDescriptor device_link_throughput_limit_descriptor;
 
     rclcpp::TimerBase::SharedPtr timer_;
     std::chrono::steady_clock::time_point last_frame_;

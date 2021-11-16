@@ -54,7 +54,11 @@ MonoCamera::MonoCamera(const std::string & node_name, const rclcpp::NodeOptions 
   	this->declare_parameter("camera_ip_addr", rclcpp::ParameterValue(""), camera_ip_addr_descriptor);
     guid_descriptor.description = "The IP address for the camera.";
   	this->declare_parameter("guid", rclcpp::ParameterValue(""), guid_descriptor);
-  	trig_timestamp_topic_descriptor.description = "Sets the topic from which an externally trigged camera receives its trigger timestamps.";
+  	device_link_throughput_limit_mode_descriptor.description = "Device link throughput mode.";
+    this->declare_parameter("device_link_throughput_limit_mode", rclcpp::ParameterValue("On"), device_link_throughput_limit_mode_descriptor);
+    device_link_throughput_limit_descriptor.description = "Device link throughput mode.";
+    this->declare_parameter("device_link_throughput_limit", rclcpp::ParameterValue(200000000), device_link_throughput_limit_descriptor);
+    trig_timestamp_topic_descriptor.description = "Sets the topic from which an externally trigged camera receives its trigger timestamps.";
   	this->declare_parameter("trig_timestamp_topic", rclcpp::ParameterValue(""), trig_timestamp_topic_descriptor);
   	acquisition_mode_descriptor.description = "Camera acquisition mode";
   	this->declare_parameter("acquisition_mode", rclcpp::ParameterValue("Continuous"), acquisition_mode_descriptor);
@@ -63,7 +67,7 @@ MonoCamera::MonoCamera(const std::string & node_name, const rclcpp::NodeOptions 
   	trigger_source_descriptor.description = "Camera trigger source";
   	this->declare_parameter("trigger_source", rclcpp::ParameterValue("FixedRate"), trigger_source_descriptor);
   	trigger_mode_descriptor.description = "Camera trigger mode";
-  	this->declare_parameter("trigger_mode", rclcpp::ParameterValue("On"), trigger_mode_descriptor);
+  	this->declare_parameter("trigger_mode", rclcpp::ParameterValue("Off"), trigger_mode_descriptor);
   	trigger_selector_descriptor.description = "Camera trigger selector";
   	this->declare_parameter("trigger_selector", rclcpp::ParameterValue("FrameStart"), trigger_selector_descriptor);
   	trigger_activation_descriptor.description = "Camera trigger activation";
@@ -176,7 +180,7 @@ MonoCamera::MonoCamera(const std::string & node_name, const rclcpp::NodeOptions 
    * yaml file isn't used or doesn't line up perfectly.
    */
     parametersCallback(this->get_parameters({
-      "height", "width", "camera_ip_addr", "guid", "acquisition_mode", "acquisition_rate", "balance_ratio_abs", 
+      "height", "width", "camera_ip_addr", "guid", "device_link_throughput_limit_mode", "device_link_throughput_limit", "acquisition_mode", "acquisition_rate", "balance_ratio_abs", 
       "balance_ratio_selector", "binning_x", "binning_y", "decimation_x", "decimation_y", 
       "exposure", "exposure_auto", "exposure_auto_alg", "exposure_auto_max", "exposure_auto_min", 
       "exposure_auto_outliers", "exposure_auto_rate", "exposure_auto_target", "exposure_auto_tol", 
@@ -230,6 +234,18 @@ rcl_interfaces::msg::SetParametersResult MonoCamera::parametersCallback (
     {
       camera_config_.guid = parameter.as_string();
       RCLCPP_INFO(this->get_logger(), "Parameter 'guid' changed to: %s", camera_config_.guid.c_str()); 
+    }
+    else if (parameter.get_name() == "device_link_throughput_limit_mode" &&
+        parameter.get_type() == rclcpp::ParameterType::PARAMETER_STRING)
+    {
+      camera_config_.device_link_throughput_limit_mode = parameter.as_string();
+      RCLCPP_INFO(this->get_logger(), "Parameter 'device_link_throughput_limit_mode' changed to: %s", camera_config_.device_link_throughput_limit_mode.c_str()); 
+    }
+    else if (parameter.get_name() == "device_link_throughput_limit" &&
+        parameter.get_type() == rclcpp::ParameterType::PARAMETER_INTEGER)
+    {
+      camera_config_.device_link_throughput_limit = parameter.as_int();
+      RCLCPP_INFO(this->get_logger(), "Parameter 'device_link_throughput_limit' changed to: %d", camera_config_.device_link_throughput_limit); 
     }
     else if (parameter.get_name() == "trig_timestamp_topic" &&
         parameter.get_type() == rclcpp::ParameterType::PARAMETER_STRING)
